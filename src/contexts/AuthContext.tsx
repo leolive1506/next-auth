@@ -1,5 +1,5 @@
 import Router from "next/router"
-import { setCookie, parseCookies } from "nookies"
+import { setCookie, parseCookies, destroyCookie } from "nookies"
 import { createContext, ReactNode, useEffect, useState } from "react"
 import { api } from "../services/api"
 
@@ -24,6 +24,12 @@ interface AuthProviderProps {
     children: ReactNode
 }
 
+export function signOut() {
+    destroyCookie(undefined, 'auth.token')
+    destroyCookie(undefined, 'auth.refreshToken')
+    Router.push('/')
+}
+
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User>()
     const isAuthenticated = !!user
@@ -36,6 +42,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 const { email, permissions, roles } = res.data
 
                 setUser({ email, permissions, roles })
+            })
+            // cai aqui quando não for erro de refresh token, se for refresh token o axios intercepta
+            .catch(() => {
+                signOut()
             })
         }
     }, [])
