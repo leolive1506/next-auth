@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
-import { signOut } from '../contexts/AuthContext'
+import { setCookieAndRefreshToken, signOut } from '../contexts/AuthContext'
 
 let cookies = parseCookies()
 let isRefreshing = false
@@ -12,6 +12,8 @@ export const api = axios.create(({
         Authorization: `Bearer ${cookies['auth.token']}`
     }
 }))
+
+
 
 api.interceptors.response.use(response => {
     // se der certo faz nada
@@ -27,21 +29,13 @@ api.interceptors.response.use(response => {
             const originalConfig = error.config
 
             if(!isRefreshing) {
-                isRefreshing = true 
+                isRefreshing = true
 
                 api.post('/refresh', {
                     refreshToken
                 }).then(response => {
-                    const { token } = response.data
-                    setCookie(undefined, 'auth.token', token, {
-                        maxAge: 60 * 60 * 24 * 30,
-                        path: '/'
-                    })
-                    setCookie(undefined, 'auth.refreshToken', response.data.refreshToken, {
-                        maxAge: 60 * 60 * 24 * 30,
-                        path: '/'
-                    })
-                    api.defaults.headers['Authorization'] = `Bearer ${token}`
+                    const { token, refreshToken: newRefreshToken } = response.data
+                    setCookieAndRefreshToken(token, newRefreshToken)
                      
                     // executanto as reqs
                     failedRequestQueue.forEach(req => req.onSuccess(token))
