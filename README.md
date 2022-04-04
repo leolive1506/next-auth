@@ -138,4 +138,8 @@ api.interceptors.response.use(response => {
 })
 ```
 
-
+# JWT DECODE
+- Decodificar um token
+```sh
+yarn add jwt-decode
+```

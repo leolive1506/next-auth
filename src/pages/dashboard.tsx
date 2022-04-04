@@ -13,6 +13,7 @@ export default function Dashboard() {
     const userCanSeeMetrics = useCan({
         roles: ['administrator', 'editor']
     })
+
     useEffect(() => {    
         api.get('/me')
         .then(res => console.log(res.data))
@@ -22,11 +23,9 @@ export default function Dashboard() {
     return (
         <>
             <h1>Dashboard: {user?.email}</h1>
-
             <Can permissions={['metrics.list']}>
                 <div>Métricas</div>              
-            </Can>
-            
+            </Can> 
         </>
     )
 }
