@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios'
-import { destroyCookie, parseCookies, setCookie } from 'nookies'
+import { parseCookies } from 'nookies'
 import { setCookieAndRefreshToken, signOut } from '../contexts/AuthContext'
 import { AuthTokenError } from './errors/AuthTokenError'
 
