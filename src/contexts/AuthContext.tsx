@@ -1,7 +1,7 @@
 import Router from "next/router"
 import { setCookie, parseCookies, destroyCookie } from "nookies"
 import { createContext, ReactNode, useEffect, useState } from "react"
-import { api } from "../services/api"
+import { api } from "../services/apiClient"
 
 type User = {
     email: string
@@ -24,19 +24,23 @@ interface AuthProviderProps {
     children: ReactNode
 }
 
+export function destroyCookieAuth(ctx = undefined) {
+    destroyCookie(ctx, 'auth.token')
+    destroyCookie(ctx, 'auth.refreshToken')
+}
+
 export function signOut() {
-    destroyCookie(undefined, 'auth.token')
-    destroyCookie(undefined, 'auth.refreshToken')
+    destroyCookieAuth()
     Router.push('/')
 }
 
-export function setCookieAndRefreshToken(token, refreshToken) {
+export function setCookieAndRefreshToken(ctx = undefined, token, refreshToken) {
     // contexto_req(nao existe lado browser), nome_cookie, valor
-    setCookie(undefined, 'auth.token', token, {
+    setCookie(ctx, 'auth.token', token, {
         maxAge: 60 * 60 * 24 * 30,
         path: '/'
     })
-    setCookie(undefined, 'auth.refreshToken', refreshToken, {
+    setCookie(ctx, 'auth.refreshToken', refreshToken, {
         maxAge: 60 * 60 * 24 * 30,
         path: '/'
     })
@@ -69,7 +73,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 email, password
             })
             const { token, refreshToken, permissions, roles } = response.data
-            setCookieAndRefreshToken(token, refreshToken)
+            setCookieAndRefreshToken(undefined, token, refreshToken)
             setUser({
                 email,
                 permissions,
