@@ -143,3 +143,7 @@ api.interceptors.response.use(response => {
 ```sh
 yarn add jwt-decode
 ```
+
+# Broadcast Channel
+- Contexto do browser mesmo dominio
+    - Comunicação entre diferentes janelas
